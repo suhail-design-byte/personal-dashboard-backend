@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 require('dotenv').config();
 
 const Task = require('./models/Task');
@@ -8,6 +9,7 @@ const Note = require('./models/Note');
 const app = express();
 const PORT = 3000;
 
+app.use(cors());
 app.use(express.json());
 
 // Connect to MongoDB
@@ -45,6 +47,20 @@ app.delete('/tasks/:id', async (req, res) => {
     res.status(204).send();
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Update a task (toggle done)
+app.put('/tasks/:id', async (req, res) => {
+  try {
+    const updatedTask = await Task.findByIdAndUpdate(
+      req.params.id,
+      { done: req.body.done },
+      { new: true }
+    );
+    res.json(updatedTask);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
 });
 
